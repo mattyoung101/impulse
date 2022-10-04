@@ -1,0 +1,1 @@
+This folder mostly contains a bunch of crap to prototype the oscillators in Python.
