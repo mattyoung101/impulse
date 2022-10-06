@@ -13,13 +13,22 @@ Directory layout:
 - Matt Young
 - Ethan Lo
 
-## Running simulations
-The simulation tool currently used is Icarus Verilog. If that proves to be too slow, I might move to
-Verilator.
+## Simulation
+### Configuring the development environment
+- Install Icarus Verilog: `sudo apt install iverilog`
+- Install VSCode and the [Verilog extension](https://marketplace.visualstudio.com/items?itemName=mshr-h.VerilogHDL) by mshr-h
+    - Install Universal Ctags: `sudo apt install universal-ctags`
+    - Install svls, the SystemVerilog language server: download from [the GitHub repo](https://github.com/dalance/svls) and
+    make sure the extracted binary is in VSCode's $PATH. I just moved it to /usr/bin.
+    - Configure the extension to use Ctags and svls
+    - TODO instead of using this extension, use the other one - or figure out how to convince this one to let us use modules correctly
+- TODO SCons/Waf?
 
+### Running simulations
 TODO
 
-## Synthesizing for the Lattice ECP5
+## Lattice ECP5 Synthesis
+### Introduction
 The main FPGA that the Impulse I can be synthesized for is the Lattice ECP5. Specifically, we will either
 target the [OrangeCrab](https://groupgets.com/manufacturers/good-stuff-department/products/orangecrab) or
 the [ULX3S](https://www.crowdsupply.com/radiona/ulx3s) (probably the latter because of its built-in audio
@@ -27,7 +36,7 @@ jack). Eventually, we will also target synthesis on our custom PCB, but that is 
 
 We use the Yosys suite, including nextpnr, as our synthesis tool.
 
-TODO
+### Configuring the synthesis toolchain
 
 ## Synthesizing for ASIC
 One day, hopefully ;)
