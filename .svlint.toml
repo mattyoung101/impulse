@@ -5,4 +5,13 @@ prefix_instance = ""
 [rules]
 blocking_assignment_in_always_ff = true
 case_default = true
-default_nettype_none = true
+function_same_as_system_function = true
+genvar_declaration_in_loop = true
+if_with_begin = true
+localparam_explicit_type = true
+loop_variable_declaration = true
+non_ansi_module = true
+non_blocking_assignment_in_always_comb = true
+parameter_explicit_type = true
+style_indent = true
+style_keyword_1or2space = true

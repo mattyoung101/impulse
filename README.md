@@ -16,12 +16,12 @@ Directory layout:
 ## Simulation
 ### Configuring the development environment
 - Install Icarus Verilog: `sudo apt install iverilog`
-- Install VSCode and the [Verilog extension](https://marketplace.visualstudio.com/items?itemName=mshr-h.VerilogHDL) by mshr-h
-    - Install Universal Ctags: `sudo apt install universal-ctags`
+- Install VSCode and the following extensions:
+    - [Verilog extension](https://marketplace.visualstudio.com/items?itemName=eirikpre.systemverilog) by Eirik Prestegårdshus
     - Install svls, the SystemVerilog language server: download from [the GitHub repo](https://github.com/dalance/svls) and
-    make sure the extracted binary is in VSCode's $PATH. I just moved it to /usr/bin.
-    - Configure the extension to use Ctags and svls
-    - TODO instead of using this extension, use the other one - or figure out how to convince this one to let us use modules correctly
+    make sure the extracted binary is in VSCode's $PATH. I just moved it to /usr/local/bin.
+    - Then, install the [svls-vscode](https://marketplace.visualstudio.com/items?itemName=dalance.svls-vscode) extension by dalance.
+    - As you might be able to tell, this is all a bit of a hack, and not ideal. I'm looking in a better setup.
 - TODO SCons/Waf?
 
 ### Running simulations
