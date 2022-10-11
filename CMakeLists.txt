@@ -17,21 +17,42 @@ set(VVP_FLAGS "-fst")
 file(GLOB_RECURSE RTL_SRC "rtl/*.sv") # regular RTL sources
 file(GLOB_RECURSE TB_SRC "testbench/*.sv") # testbench sources
 
+# list of VVP files we created, for execution
+set(vvpFiles "")
+
 # Compile testbenches into VVPs using Icarus Verilog
-add_custom_target(makevvps ALL) 
+add_custom_target(makevvps DEPENDS ${RTL_SRC}) 
 foreach(file ${TB_SRC})
     # transform input filename into the name of the VVP
     get_filename_component(fileName ${file} NAME_WE)
     set(vvpFile "${CMAKE_CURRENT_BINARY_DIR}/${fileName}.vvp")
+    message(STATUS "[makevvps] Will compile vvp: ${vvpFile} from source: ${file}")
 
-    # register with makevvps that we want to have this vvp made
+    # register with makevvps that we want to have this vvp made with iverilog
     add_custom_command(TARGET makevvps
-        COMMAND ${IVERILOG} ${IVERILOG_FLAGS} -o ${vvpFile} ${RTL_SRC}
+        COMMAND ${IVERILOG} ${IVERILOG_FLAGS} -o ${vvpFile} ${file} ${RTL_SRC}
         BYPRODUCTS ${vvpFile}
+        COMMENT "Building vvp file ${vvpFile}, flags: ${IVERILOG_FLAGS}"
         VERBATIM
     )
-
-    # TODO append this VVP to the list of VVPs
+    
+    # append this VVP file to the list of VVPs to run
+    list(APPEND vvpFiles ${vvpFile})
 endforeach()
 
+message(STATUS "List of all VVP files: ${vvpFiles}")
+
 # Run VVPs
+add_custom_target(sim ALL DEPENDS makevvps)
+foreach(file ${vvpFiles})
+    message(STATUS "[sim] Will run vvp: ${file}")
+
+    # register with sim that we want to run this vvp file
+    add_custom_command(TARGET sim
+        COMMAND ${VVP} ${file} ${VVP_FLAGS}
+        COMMENT "Running vvp file ${file}, flags: ${VVP_FLAGS}"
+        VERBATIM
+    )
+endforeach()
+
+# TODO remove VCD files when make clean is run

@@ -7,19 +7,20 @@ module multiplier_tb();
     multiplier mult(a,b,y);
 
     initial begin
+        $write("hello world?????\n");
         $dumpfile("multiplier.vcd");
         $dumpvars;
 
         a = 8'd2;
         b = 8'd2;
         #10;
-        $display("a = %d, b = %d, y = %d\n", a, b, y);
+        $display("a = %d, b = %d, y = %d", a, b, y);
 
         a = 8'd4;
         b = 8'd4;
         #10;
-        $display("a = %d, b = %d, y = %d\n", a, b, y);
-        $write("done");
+        $display("a = %d, b = %d, y = %d", a, b, y);
+        $write("done\n");
     end
 endmodule
 

@@ -1,8 +1,6 @@
 # Impulse
 Impulse is a retro-inspired FPGA music synthesiser with MIDI support, written in SystemVerilog.
 
-This repository houses the first iteration of the Impulse synthesiser, the Impulse I.
-
 Directory layout:
 - concept: Python code to test the overall concept of the synth (oscillators, mixing, etc).
 - rtl: SystemVerilog RTL code.
@@ -16,6 +14,7 @@ Directory layout:
 ## Simulation
 ### Setting up the simulation toolchain
 - Install Icarus Verilog: `sudo apt install iverilog`
+- Install GTKWave: `sudo apt install gtkwave`
 - Install VSCode and the following additional components:
     - [Verilog extension](https://marketplace.visualstudio.com/items?itemName=eirikpre.systemverilog) by Eirik Prestegårdshus
     - Install svls, the SystemVerilog language server: download from [the GitHub repo](https://github.com/dalance/svls) and
@@ -25,7 +24,20 @@ Directory layout:
 - Install a recent version of CMake. I recommend using the [CMake PPA](https://apt.kitware.com/)
 
 ### Running simulations
-TODO
+I use CMake as the build tool. It actually works surprisingly well with custom targets. Here's how you can run
+the simulations:
+
+1. `cmake -B build` to generate the build files
+2. `cd build`
+3. `make sim` to compile the SystemVerilog testbenches into VVP files with IVerilog, and execute these files with IVerilog's `vvp`
+
+You can then look at the .vcd files in the build directory. They are in the FST file format, which is faster
+and better than all the others according to my reading. They can be viewed in GTKWave.
+
+If you add or remove any SystemVerilog, you will need to run CMake due to the use of globs. Otherwise, between
+runs just type `make sim` in the build directory.
+
+`make clean` will delete the VVP files. Currently VCD files are not deleted, but I'll do this in the future.
 
 ## Lattice ECP5 Synthesis
 ### Introduction
@@ -38,6 +50,10 @@ I use the Yosys suite, including nextpnr, as our synthesis tool. In the future, 
 Verilog to Routing and compare these two tools' performance.
 
 ### Setting up the synthesis toolchain
+TODO
+
+### Performing synthesis
+TODO
 
 ## Synthesizing for ASIC
 Right now we do not have the financial resources to target ASIC production (both in terms of EDA tools and actually
