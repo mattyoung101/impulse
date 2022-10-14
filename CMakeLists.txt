@@ -1,6 +1,7 @@
 # Build script for Impulse
-# Although CMake is definitely _not_ designed for building Verilog (you will see copius amounts of hacks in here),
-# it is a LOT easier to use for me than Make, and works really well!
+# Although CMake is definitely _not_ designed for building Verilog (you will see copius amounts of custom targets in here),
+# it is hugely easier to use for me than plain old Make, and actually works surprinsingly well!
+# I'm pretty happy with this build script overall, and was surprised it didn't take me a week to write.
 # Matt Young, 2022
 cmake_minimum_required(VERSION 3.18)
 project(impulse)
@@ -21,15 +22,16 @@ file(GLOB_RECURSE TB_SRC "testbench/*.sv") # testbench sources
 set(vvpFiles "")
 
 # Compile testbenches into VVPs using Icarus Verilog
-add_custom_target(makevvps DEPENDS ${RTL_SRC}) 
+add_custom_target(makevvps DEPENDS ${RTL_SRC} ${TB_SRC}) 
 foreach(file ${TB_SRC})
-    # transform input filename into the name of the VVP
-    get_filename_component(fileName ${file} NAME_WE)
+    # transform input filename into the name of the vvp we want
+    get_filename_component(fileName ${file} NAME_WE) # this should be replaced with cmake_path (required >3.20)
     set(vvpFile "${CMAKE_CURRENT_BINARY_DIR}/${fileName}.vvp")
     message(STATUS "[makevvps] Will compile vvp: ${vvpFile} from source: ${file}")
 
     # register with makevvps that we want to have this vvp made with iverilog
     add_custom_command(TARGET makevvps
+        # invoke iverilog correctly: iverilog <flags> -o <vvpFile> <inputFile> <modules...>
         COMMAND ${IVERILOG} ${IVERILOG_FLAGS} -o ${vvpFile} ${file} ${RTL_SRC}
         BYPRODUCTS ${vvpFile}
         COMMENT "Building vvp file ${vvpFile}, flags: ${IVERILOG_FLAGS}"
@@ -52,7 +54,6 @@ foreach(file ${vvpFiles})
         COMMAND ${VVP} ${file} ${VVP_FLAGS}
         COMMENT "Running vvp file ${file}, flags: ${VVP_FLAGS}"
         VERBATIM
+        # TODO make ALL VCD files a byproduct of sim
     )
 endforeach()
-
-# TODO remove VCD files when make clean is run
