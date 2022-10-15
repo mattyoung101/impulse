@@ -11,7 +11,9 @@ find_program(IVERILOG iverilog REQUIRED)
 find_program(VVP vvp REQUIRED)
 
 # Tool flags
-set(IVERILOG_FLAGS "-g2005-sv" "-Wall")
+# -g2012 means we support SystemVerilog 2012 (see `man iverilog`)
+set(IVERILOG_FLAGS "-g2012" "-Wall")
+# -fst is the best format for vvp (see `man vvp`)
 set(VVP_FLAGS "-fst")
 
 # Source files. Since these are globs, you will have to rerun CMake if you add new files.
@@ -22,6 +24,7 @@ file(GLOB_RECURSE TB_SRC "testbench/*.sv") # testbench sources
 set(vvpFiles "")
 
 # Compile testbenches into VVPs using Icarus Verilog
+# TODO rename "makevvps" to "compile_sim"
 add_custom_target(makevvps DEPENDS ${RTL_SRC} ${TB_SRC}) 
 foreach(file ${TB_SRC})
     # transform input filename into the name of the vvp we want
