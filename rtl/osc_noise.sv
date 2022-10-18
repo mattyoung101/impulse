@@ -28,15 +28,12 @@ module osc_noise(
     // LFSR value
     logic [16:0] lfsr = 16'hACE1;
 
-    // reset circuit
-    always_ff @(posedge rst) begin
-        counter <= 0;
-        lfsr <= 16'hACE1;
-        $display("[osc_noise] reset");
-    end
-
     always_ff @(posedge clk) begin
-        if (counter >= period) begin
+        if (rst) begin
+            // reset logic
+            counter <= 0;
+            lfsr <= 16'hACE1;
+        end else if (counter >= period) begin
             // period has elapsed, time to generate a sample
             // uses the Galois representation (see the ZipCPU article), the hex 0xD008 are the maximal period
             // 16-bit taps as listed above
@@ -47,7 +44,8 @@ module osc_noise(
             end
 
             counter <= 0;
-        end else begin
+        end else if (counter < period) begin
+            // not reset and still counting up
             // counter update has to be here, otherwise it doesn't work as it should
             counter <= counter + 1;
         end

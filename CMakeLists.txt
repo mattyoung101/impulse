@@ -9,6 +9,12 @@ project(impulse)
 # Tools
 find_program(IVERILOG iverilog REQUIRED)
 find_program(VVP vvp REQUIRED)
+find_program(YOSYS yosys REQUIRED)
+# probably add nextpnr here as well
+
+message(STATUS "Icarus Verilog: ${IVERILOG}")
+message(STATUS "VVP: ${VVP}")
+message(STATUS "Yosys: ${YOSYS}")
 
 # Tool flags
 # -g2012 means we support SystemVerilog 2012 (see `man iverilog`)
@@ -60,3 +66,13 @@ foreach(file ${vvpFiles})
         # TODO make ALL VCD files a byproduct of sim
     )
 endforeach()
+
+# Synthesise using Yosys for ECP5. The script used is scripts/ecp5.ys (that way we can update synth commands
+# without rebuilding CMake)
+add_custom_target(yosys_ecp5)
+add_custom_command(TARGET yosys_ecp5
+    COMMAND ${YOSYS} scripts/ecp5.ys
+    COMMENT "Synthesising for Lattice ECP5 to ecp5.json in ${CMAKE_BINARY_DIR}"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    VERBATIM
+)

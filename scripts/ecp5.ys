@@ -1,0 +1,11 @@
+# Yosys synthesis script for the Lattice ECP5 FPGA
+# Run with `make yosys_ecp5`, don't run input into Yosys directly (for compatibility)
+# References:
+# - https://github.com/Ravenslofty/yosys-cookbook/blob/master/ecp5.md
+# - Yosys manual and readme
+# Matt Young, 2022
+
+# TEMPORARY (this would be rtl/impulse_top.sv once that's done)
+read_verilog -sv rtl/osc_noise.sv
+# note -nowidelut will increase delays but we are pressed for area not for speed
+synth_ecp5 -abc9 -nowidelut -json build/ecp5.json
