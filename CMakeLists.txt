@@ -1,8 +1,13 @@
+# This file is part of Impulse, the retro music FPGA synthesizer.
+# Copyright (c) 2022 Matt Young. All rights reserved.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0
+#
 # Build script for Impulse
 # Although CMake is definitely _not_ designed for building Verilog (you will see copius amounts of custom targets in here),
-# it is hugely easier to use for me than plain old Make, and actually works surprinsingly well!
-# I'm pretty happy with this build script overall, and was surprised it didn't take me a week to write.
-# Matt Young, 2022
+# it is hugely easier to use for me than plain old Make, and actually works surprinsingly well.
 cmake_minimum_required(VERSION 3.18)
 project(impulse)
 
@@ -76,3 +81,5 @@ add_custom_command(TARGET yosys_ecp5
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     VERBATIM
 )
+
+# TODO add nextpnr_ecp5 target, and also a "flash_ecp5" target that does yosys -> nextpnr -> upload to devkit

@@ -110,4 +110,4 @@ That being said, if time and motivation permit, I will look into OpenLane and th
 to see if I can produce a design that could in theory be fabbed, just for fun :P
 
 ## Licence
-Currently being decided. Either proprietary or MPL 2.0.
+Mozilla Public License 2.0
