@@ -1,10 +1,10 @@
 // This file is part of Impulse, the retro music FPGA synthesizer.
 // Copyright (c) 2022 Matt Young. All rights reserved.
-//
+
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0
-//
+
 // Noise oscillator for Impulse
 // This oscillator is based on a 16-bit maximal-period LFSR, sourced from:
 // https://en.wikipedia.org/wiki/Linear-feedback_shift_register#Example_polynomials_for_maximal_LFSRs
@@ -14,18 +14,22 @@
 
 module osc_noise(
     // AUDIO PARAMS
+    // INPUTS
     // clock line to generate noise samples
     input logic clk,
     // true if we should reset
     input logic rst,
     // true if oscillator is enabled
     input logic en,
+    // volume between -32768 and 32767
+    input logic signed[16:0] volume,
+    // OUTPUTS
     // 16-bit signed audio sample
     output logic signed[16:0] sample,
 
     // OSCILLATOR PARAMS
     // period: wait this many samples before updating the noise value 
-    input logic[16:0] period
+    input logic [16:0] period
 );
     // current counter between samples (via period)
     logic [16:0] counter = 0;
@@ -57,9 +61,9 @@ module osc_noise(
         // assign the current sample if the oscillator is enabled, otherwise just output silence
         if (en) begin
             if (lfsr[0]) begin
-                sample <= 16'd32767; // INT16_MAX
+                sample <= volume;
             end else begin 
-                sample <= -16'd32768; // INT16_MIN
+                sample <= -volume;
             end
         end else begin 
             sample <= 0;

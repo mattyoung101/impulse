@@ -1,17 +1,11 @@
-# This file is part of Impulse, the retro music FPGA synthesizer.
-# Copyright (c) 2022 Matt Young. All rights reserved.
-#
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/
-#
 # Yosys synthesis script for the Lattice ECP5 FPGA
 # Run with `make yosys_ecp5`, don't run input into Yosys directly (for compatibility)
 # References:
 # - https://github.com/Ravenslofty/yosys-cookbook/blob/master/ecp5.md
 # - Yosys manual and readme
 
-# TEMPORARY (this would be rtl/impulse_top.sv once that's done)
-read_verilog -sv rtl/osc_noise.sv
+read_verilog -sv rtl/*sv
+# TODO set top module here
+
 # note -nowidelut will increase delays but we are pressed for area not for speed
 synth_ecp5 -abc9 -nowidelut -json build/ecp5.json
