@@ -4,8 +4,9 @@
 # - https://github.com/Ravenslofty/yosys-cookbook/blob/master/ecp5.md
 # - Yosys manual and readme
 
-read_verilog -sv rtl/*sv
-# TODO set top module here
+read_verilog -sv rtl/*.sv
+# FIXME temporary!!
+hierarchy -top osc_noise
 
 # note -nowidelut will increase delays but we are pressed for area not for speed
 synth_ecp5 -abc9 -nowidelut -json build/ecp5.json

@@ -7,14 +7,14 @@
 
 // Noise oscillator testbench
 `timescale 1ns/1ns
-
 module osc_noise_tb();
     logic clk, rst, en;
     logic signed[16:0] sample, volume;
-    logic [16:0] period;
+    logic [7:0] note;
+
     int fd;
 
-    osc_noise osc(clk, rst, en, volume, sample, period);
+    osc_noise osc(clk, rst, en, volume, sample, note);
 
     initial begin
         $display("[osc_noise_tb] Starting noise oscillator testbench");
@@ -24,7 +24,7 @@ module osc_noise_tb();
         
         // device parameters
         en = 1;
-        period = 16'd1;
+        note = 16'd60; // middle C, 261.63 Hz
         volume = 16'd16384;
 
         // reset the device
@@ -64,7 +64,7 @@ module osc_noise_tb();
         // check volume control and period works works
         en = 1;
         volume = 16'd1024;
-        period = 16'd64;
+        note = 16'd96; // C7, 2093.00 Hz
         // reset the device
         rst = 1;
         #10;

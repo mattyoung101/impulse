@@ -7,3 +7,4 @@
 
 // This is the top file of Impulse (presumably for the Lattice ECP5)
 // TODO
+`timescale 1ns/1ns

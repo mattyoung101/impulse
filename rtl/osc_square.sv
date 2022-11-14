@@ -6,8 +6,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0
 
 // Square wave oscillator for Impulse, with configurable pulse width
-
-module osc_noise(
+`timescale 1ns/1ns
+module osc_square(
     // AUDIO PARAMS
     // INPUTS
     // clock line to generate samples
@@ -29,4 +29,9 @@ module osc_noise(
     input logic [14:0] pulseWidth
 );
     // TODO
+    // I think we should make a new module which maintains a table that maps MIDI note to clock period
+    // for example, at 44.1 KHz, and we want a 440 Hz square wave, 44100 / 440 = 100 samples period
+    // but unless we make a divider circuit we need this to be in a table
+    // the problem is that currently we take frequency in Hz instead of MIDI note number as the input
+    // maybe we should change that? either that or actually implement a divider
 endmodule

@@ -16,29 +16,33 @@ and Yosys synthesis output.
 
 **Authors:**
 - Matt Young (m.young2@uqconnect.edu.au)
-- Ethan Lo
+
+## Project overview
+### About Impulse
+TODO explain the synth here
+
+### Verification procedure
+TODO explain, or link to document explaining, how we will verify it
 
 ## Installing tools
-This project relies on many open source tools for simulation and synthesis, a lot of which you will need to
-compile from source.
+This project relies on many open source tools for simulation and synthesis. You will need to
+compile all these tools from source, because they are either too outdated in the repositories, or not shipped at all.
 
-In the future this environment will be built as some type of Docker container along with the Yosys suite,
-for easy setup, but I haven't gotten around to that yet.
+Luckily for you, I've made a project called *open_eda_builder* which automatically produces bleeding-edge
+builds of these tools! To learn more and download a release, please visit: https://github.com/mattyoung101/open_eda_builder 
+(this is completely free & open source, it doesn't cost any money to download).
+
+If you don't want to use open_eda_builder, you could use Yosys' [oss-cad-suite-build](https://github.com/YosysHQ/oss-cad-suite-build)
+or build each of the tools listed in open_eda_builder from scratch.
+
+### Installing the remaining tools
+There are a few tools that open_eda_builder does not ship, because the versions Ubuntu provides are actually
+suitable, or the tools are too general purpose (e.g. CMake).
 
 These notes assume you are running an Ubuntu derivative, because I run Linux Mint. However, instructions should
-be relatively portable across Linuxes. YMMV on Mac or Windows.
+be relatively portable across Linuxes.
 
-### Setting up the simulation toolchain
-- Install Icarus Verilog. In order to support SystemVerilog properly, you must compile Icarus from source code (the version
-Ubuntu ships is too old to support `always_ff`, for example).
-    - Clone the [Icarus Verilog repo](https://github.com/steveicarus/iverilog) and enter it
-    - Install dependencies: `sudo apt install bison flex gperf libreadline-dev libreadline8` and any non-prehistoric C++ compiler
-    - `sh autoconf.sh`
-    - _(Fish shell only, if you want Clang)_ `set -x CC clang-12; set -x CXX clang++-12`
-    - `./configure`
-    - `make -j32`
-    - `sudo make install`
-    - Further instructions can be found in the Icarus Verilog README or the [Installation Guide](https://iverilog.fandom.com/wiki/Installation_Guide#Installation_From_Source) on the Icarus Verilog wiki. The notes above come from my reading of these two resources.
+- Install a recent version of CMake. I recommend using the [CMake PPA](https://apt.kitware.com/)
 - Install GTKWave: `sudo apt install gtkwave`
 - Install VSCode and the following additional components:
     - [Verilog extension](https://marketplace.visualstudio.com/items?itemName=eirikpre.systemverilog) by Eirik Prestegårdshus
@@ -47,16 +51,8 @@ Ubuntu ships is too old to support `always_ff`, for example).
     - Then, install the [svls-vscode](https://marketplace.visualstudio.com/items?itemName=dalance.svls-vscode) extension by dalance.
     - As you might be able to tell, this is all a bit of a hack, and not ideal (especially the fact that _two_ extensions are
     required). I'm looking into whether or not I can create a better extension of my own design using Verible.
-- Install a recent version of CMake. I recommend using the [CMake PPA](https://apt.kitware.com/)
 
-### Setting up the synthesis toolchain
-- Install Yosys. You will need to compile from source. Clone the [Yosys repo](https://github.com/YosysHQ/yosys)
-and follow the instructions in the README (under the "Building from Source" section).
-    - It's also possible to use [oss-cad-suite-build](https://github.com/YosysHQ/oss-cad-suite-build), especially for
-    Yosys. However I am having problems starting Nextpnr using this on Linux Mint, and they are refusing to answer
-    my GitHub issue pointing this out, so I don't recommend it.
-- Install Nextpnr
-    - TODO
+Congrats. You now have a full, 100% open source FPGA toolchain setup and installed.
 
 ## Simulation
 ### Introduction
@@ -72,9 +68,9 @@ by the CMake script.
 I use CMake as the build tool. It actually works surprisingly well for this, using custom targets. Here's how you can run
 the simulations:
 
-1. `cmake -B build` to generate the build files
-2. `cd build`
-3. `make sim` to compile the SystemVerilog testbenches into VVP files with IVerilog, and execute these files with IVerilog's `vvp`
+- `cmake -B build` to generate the build files
+- `cd build`
+- `make ivl_sim` to compile and execute SystemVerilog testbenches using Icarus Verilog
 
 You can then look at the .vcd files in the build directory. They are in the FST file format, which is faster
 and better than all the others according to my reading. They can be viewed in GTKWave.
@@ -84,8 +80,7 @@ runs just type `make sim` in the build directory.
 
 `make clean` will delete the VVP files. Currently VCD files are not deleted, but I'll do this in the future.
 
-_Note: In the near future I'd also like to support using Verilator as an additional simulator, and make a cycle-accurate
-VST of the synth. In the mean time, I'll be sticking with Icarus though._
+_Note 1: In the near future I'd also like to support using Verilator and possibly Yosys CXXRTL as additional simulators, and compare the synth between them all to ensure correctness. In the mean time, I'll be sticking with Icarus though._
 
 _Note 2: I'd also like to support vunit or cocotb for verification._
 
@@ -106,8 +101,9 @@ TODO
 Right now we do not have the financial resources to target ASIC production (both in terms of EDA tools and actually
 getting on a shuttle), and it is unlikely that this design would be good enough to fab anyway.
 
-That being said, if time and motivation permit, I will look into OpenLane and the Skywater open source PDK
-to see if I can produce a design that could in theory be fabbed, just for fun :P
+That being said, given I am very interested in ASIC fabrication, once this project is complete and tested on an FPGA,
+I plan to look into OpenLane and the Skywater 130nm open-source PDK to see if I can produce a design that could in 
+theory be fabbed, just for fun!
 
 ## Licence
 Mozilla Public License 2.0

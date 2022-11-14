@@ -15,40 +15,47 @@ project(impulse)
 find_program(IVERILOG iverilog REQUIRED)
 find_program(VVP vvp REQUIRED)
 find_program(YOSYS yosys REQUIRED)
+find_package(verilator REQUIRED)
 # probably add nextpnr here as well
 
 message(STATUS "Icarus Verilog: ${IVERILOG}")
 message(STATUS "VVP: ${VVP}")
 message(STATUS "Yosys: ${YOSYS}")
+message(STATUS "Verilator: root ${VERILATOR_ROOT}, bin ${VERILATOR_BIN}")
 
 # Tool flags
 # -g2012 means we support SystemVerilog 2012 (see `man iverilog`)
 set(IVERILOG_FLAGS "-g2012" "-Wall")
 # -fst is the best format for vvp (see `man vvp`)
 set(VVP_FLAGS "-fst")
+set (VERILATOR_FLAGS "-Wall")
 
 # Source files. Since these are globs, you will have to rerun CMake if you add new files.
 file(GLOB_RECURSE RTL_SRC "rtl/*.sv") # regular RTL sources
 file(GLOB_RECURSE TB_SRC "testbench/*.sv") # testbench sources
+message(STATUS "List of all RTL sources: ${RTL_SRC}")
+message(STATUS "List of all testbench sources: ${TB_SRC}")
 
-# list of VVP files we created, for execution
+########## ICARUS VERILOG ##########
+
+# list of VVP files we created in "ivl_compile", for execution
 set(vvpFiles "")
-
 # Compile testbenches into VVPs using Icarus Verilog
-# TODO rename "makevvps" to "compile_sim"
-add_custom_target(makevvps DEPENDS ${RTL_SRC} ${TB_SRC}) 
+add_custom_target(ivl_compile DEPENDS ${RTL_SRC} ${TB_SRC}) 
+# for each testbench source...
 foreach(file ${TB_SRC})
     # transform input filename into the name of the vvp we want
-    get_filename_component(fileName ${file} NAME_WE) # this should be replaced with cmake_path (required >3.20)
+    # note: get_filename_component should be replaced with cmake_path (requires >3.20)
+    get_filename_component(fileName ${file} NAME_WE) 
     set(vvpFile "${CMAKE_CURRENT_BINARY_DIR}/${fileName}.vvp")
-    message(STATUS "[makevvps] Will compile vvp: ${vvpFile} from source: ${file}")
+    message(STATUS "[ivl_compile] Will compile vvp: ${vvpFile} from source: ${file}")
 
-    # register with makevvps that we want to have this vvp made with iverilog
-    add_custom_command(TARGET makevvps
+    # register with ivl_compile that we want to have this vvp made with iverilog
+    add_custom_command(TARGET ivl_compile
         # invoke iverilog correctly: iverilog <flags> -o <vvpFile> <inputFile> <modules...>
         COMMAND ${IVERILOG} ${IVERILOG_FLAGS} -o ${vvpFile} ${file} ${RTL_SRC}
         BYPRODUCTS ${vvpFile}
-        COMMENT "Building vvp file ${vvpFile}, flags: ${IVERILOG_FLAGS}"
+        COMMENT "Building VVP file ${vvpFile}, flags: ${IVERILOG_FLAGS}"
         VERBATIM
     )
     
@@ -58,19 +65,26 @@ endforeach()
 
 message(STATUS "List of all VVP files: ${vvpFiles}")
 
-# Run VVPs
-add_custom_target(sim ALL DEPENDS makevvps)
+# Run VVPs in Icarus Verilog (i.e. perform simulation)
+add_custom_target(ivl_sim ALL DEPENDS ivl_compile)
 foreach(file ${vvpFiles})
-    message(STATUS "[sim] Will run vvp: ${file}")
+    message(STATUS "[ivl_sim] Will run vvp: ${file}")
 
-    # register with sim that we want to run this vvp file
-    add_custom_command(TARGET sim
+    # register with ivl_sim that we want to run this vvp file
+    add_custom_command(TARGET ivl_sim
         COMMAND ${VVP} ${file} ${VVP_FLAGS}
         COMMENT "Running vvp file ${file}, flags: ${VVP_FLAGS}"
         VERBATIM
-        # TODO make ALL VCD files a byproduct of sim
+        # TODO make ALL VCD files a byproduct of ivl_sim
     )
 endforeach()
+
+########## VERILATOR ##########
+
+# Verilator
+# TODO build and run for verilator
+
+########## YOSYS / NEXTPNR ##########
 
 # Synthesise using Yosys for ECP5. The script used is scripts/ecp5.ys (that way we can update synth commands
 # without rebuilding CMake)
@@ -78,6 +92,15 @@ add_custom_target(yosys_ecp5)
 add_custom_command(TARGET yosys_ecp5
     COMMAND ${YOSYS} scripts/ecp5.ys
     COMMENT "Synthesising for Lattice ECP5 to ecp5.json in ${CMAKE_BINARY_DIR}"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    VERBATIM
+)
+
+# Synthesise using Yosys for the CXXRTL simulator. Uses scripts/cxxrtl.ys as the script.
+add_custom_target(yosys_cxxrtl)
+add_custom_command(TARGET yosys_cxxrtl
+    COMMAND ${YOSYS} scripts/cxxrtl.ys
+    COMMENT "Synthesising for CXXRTL simulator to impulse_cxxrtl.cpp in ${CMAKE_BINARY_DIR}"
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     VERBATIM
 )

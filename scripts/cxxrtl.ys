@@ -1,0 +1,11 @@
+# Yosys synthesis script for the CXXRTL simulator
+# Run with `make yosys_cxxrtl`, don't run input into Yosys directly (for compatibility)
+# References:
+# - https://tomverbeure.github.io/2020/08/08/CXXRTL-the-New-Yosys-Simulation-Backend.html
+# - Yosys manual and readme
+
+read_verilog -sv rtl/*.sv
+# FIXME temporary!!
+hierarchy -top osc_noise
+
+write_cxxrtl build/impulse_cxxrtl.cpp
